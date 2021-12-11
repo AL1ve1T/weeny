@@ -1,0 +1,12 @@
+version: "3"
+services:
+  weeny:
+    container_name: weeny
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    command:
+      ./weeny
+    image: weeny
