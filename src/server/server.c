@@ -5,3 +5,7 @@
 void RunServer() {
 
 }
+
+char* Print() {
+    return "Hello, World!\n";
+}

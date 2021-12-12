@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.12)
 project(weeny C)
 
 set(CMAKE_C_STANDARD 11)
 
-include_directories(libs/Unity/src)
+add_subdirectory(src)
+add_subdirectory(test)
 
-include_directories(src/test)
-
-add_executable(weeny src/main.c src/test/main_test.c src/defines.h src/run_tests.c src/server.c)
+add_subdirectory(external/Unity)
+target_include_directories(unity PRIVATE external/Unity)
