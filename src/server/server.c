@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <stdlib.h>
+#include "zlog.h"
 
 #define DEFAULT_PORT 1080
 
@@ -14,16 +15,25 @@
 #define PORT DEFAULT_PORT
 #endif
 
-void RunServer() {
+#include <linux/net.h>
+
+void RunServer()
+{
+    zlog_category_t *c;
+    c = zlog_get_category("default");
+
     struct sockaddr_in serveraddr;
     int sockfd;
     // Create and verify socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        //failed
+    if (sockfd == -1)
+    {
+        zlog_fatal(c, "Could not create socket.");
         exit(1);
-    } else {
-        //created
+    }
+    else
+    {
+        zlog_info(c, "Socket creation success.");
     }
     bzero(&serveraddr, sizeof(serveraddr));
 
@@ -33,23 +43,31 @@ void RunServer() {
     serveraddr.sin_port = htons(PORT);
 
     // Bind
-    if (bind(sockfd, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) != 0) {
-        // failed
-    } else {
-        // created
+    if (bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) != 0)
+    {
+        zlog_fatal(c, "Could not bind socket.");
+        exit(2);
+    }
+    else
+    {
+        zlog_info(c, "Socket binding success.");
     }
 
     // Listen
-    if (listen(sockfd, 5) != 0) {
-        // failed
-    } else {
-        // success
+    if (listen(sockfd, 5) != 0)
+    {
+        zlog_fatal(c, "Socket listen failed.");
+        exit(3);
+    }
+    else
+    {
+        zlog_info(c, "Listening started..");
     }
 
     // Accept
-
 }
 
-char* Print() {
+char *Print()
+{
     return "Hello, World!\n";
 }

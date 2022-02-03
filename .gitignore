@@ -5,3 +5,17 @@
 **/CMakeCache.txt
 external
 build
+.bash_logout
+.bashrc
+.devcontainer/
+.profile
+.vscode/
+CMakeFiles/
+CTestTestfile.cmake
+cmake-build-debug-remote/
+src/CMakeFiles/
+src/server/CMakeFiles/
+**/*.a**
+**/*.so**
+test/CMakeFiles/
+test/CTestTestfile.cmake

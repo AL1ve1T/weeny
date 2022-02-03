@@ -1,9 +1,11 @@
-FROM ubuntu:20.10
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update \
-	&& apt upgrade -y \
-	&& apt install -y \
-	apt-utils build-essential clang gdb gdbserver openssh-server rsync
+    && apt upgrade -y \
+    && apt install -y \
+    apt-utils build-essential clang gdb gdbserver openssh-server rsync cmake git
 
 RUN wget https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.tar.gz  \
     && tar xzf cmake-3.12.3-Linux-x86_64.tar.gz  \
@@ -34,6 +36,8 @@ RUN useradd -ms /bin/bash dev
 RUN echo 'dev:dev' | chpasswd
 
 RUN mkdir /usr/weeny
+
+ADD . /home/dev
 
 # Upon start, run ssh daemon
 CMD ["/usr/sbin/sshd", "-D"]
