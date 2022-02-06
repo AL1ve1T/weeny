@@ -162,6 +162,18 @@ void *Handshake(void *connfd)
         zlog_fatal(c, "Destination host: connection failed.");
         // Send 0x04 to SOCKS5 client
     }
+    // Send connection status to SOCKS5 client
+    bzero(&buf, BUF_SIZE);
+    buf[0] = socks_v;
+    buf[1] = 0x00;
+    buf[2] = 0x00;
+    buf[3] = 0x03;
+    buf[4] = host_len;
+    bcopy(host_name, &buf[5], host_len);
+    //buf[5 + host_len] = htons(dest_port);
+    dest_port = htons(dest_port);
+    bcopy(&dest_port, &buf[5 + host_len], 2);
+    send(sock, buf, 5 + host_len + 2, 0);
 
     free(host_name);
     close(sock);
