@@ -1,7 +1,10 @@
+//
+// Created by al1ve1t on 11.12.21.
+//
+
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-/////////////////////////
 #include "server/server.h"
 #include "zlog.h"
 
@@ -17,4 +20,5 @@ int main(int argc, char *argv[])
     }
 
     RunServer();
+    return 0;
 }
