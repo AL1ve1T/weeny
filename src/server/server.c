@@ -27,6 +27,7 @@
 #define USER_PASS 0x02
 
 void *Handshake(void *connfd);
+bool RetranslateBytes(int cltsock, int srvsock);
 
 zlog_category_t *c;
 
@@ -170,10 +171,15 @@ void *Handshake(void *connfd)
     buf[3] = 0x03;
     buf[4] = host_len;
     bcopy(host_name, &buf[5], host_len);
-    //buf[5 + host_len] = htons(dest_port);
     dest_port = htons(dest_port);
     bcopy(&dest_port, &buf[5 + host_len], 2);
     send(sock, buf, 5 + host_len + 2, 0);
+
+    // Retranslation of bytes begins here.
+
+    if (!RetranslateBytes(sock, dest_sock))
+    {
+    }
 
     free(host_name);
     close(sock);

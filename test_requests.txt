@@ -1,1 +1,1 @@
-curl -x socks5h://localhost:1080 http://google.com
+curl -x socks5h://localhost:1080 http://google.com/index.html -v
