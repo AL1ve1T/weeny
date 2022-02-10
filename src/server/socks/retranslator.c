@@ -5,65 +5,63 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
-#include <semaphore.h>
 #include <linux/net.h>
 
 #include "zlog.h"
 
 #define BUF_SIZE 0xFF
 
-sem_t src_sem;
-sem_t dst_sem;
-
 uint8_t src_buf[BUF_SIZE];
 uint8_t dst_buf[BUF_SIZE];
 
-bool RetranslateBytes(int srcsock, int dstsock)
+typedef struct
 {
-    sem_init(&src_sem, 0, 1);
-    sem_init(&dst_sem, 0, 1);
+    int fromfd;
+    int tofd;
+    uint8_t *buf;
+} th_args;
 
-    pthread_t sts, rfs, std, rfd; // all 4 communications name-encoded
+static void *Retranslate(void *args);
+static th_args MakeArgs(int fromfd, int tofd, uint8_t *buf);
+
+extern bool RetranslationBegin(int srcsock, int dstsock)
+{
+    // both communications name-encoded
+    pthread_t rtd;
+    pthread_t rts;
 
     // Run communication threads
-    pthread_create(&rfs, NULL, ReceiveFromSource, (void *)srcsock);
-    pthread_create(&std, NULL, SendToDestination, (void *)dstsock);
-    pthread_create(&rfd, NULL, ReceiveFromDestination, (void *)dstsock);
-    pthread_create(&sts, NULL, SendToSource, (void *)srcsock);
+    th_args src_args = MakeArgs(srcsock, dstsock, src_buf);
+    th_args dst_args = MakeArgs(dstsock, srcsock, dst_buf);
+
+    pthread_create(&rtd, NULL, Retranslate, (void *)&src_args);
+    pthread_create(&rts, NULL, Retranslate, (void *)&dst_args);
 
     // Close communication threads
-    pthread_join(rfs, NULL);
-    pthread_join(std, NULL);
-    pthread_join(rfd, NULL);
-    pthread_join(sts, NULL);
+    pthread_join(rtd, NULL);
+    pthread_join(rts, NULL);
 }
 
-void *SendToSource(int srcsock)
+static void *Retranslate(void *args)
 {
-}
+    // Unpack arguments
+    th_args *args_ = (th_args *)args;
 
-void *ReceiveFromSource(int srcsock)
-{
-    int bytes_recvd;
+    int fromfd = args_->fromfd;
+    int tofd = args_->tofd;
+    uint8_t *buf = args_->buf;
+
+    int bytes_recvd = 0;
+    int bytes_sent = 0;
     do
     {
-        sem_wait(&src_sem);
-        bytes_recvd = recv(srcsock, src_buf, BUF_SIZE, 0);
-        sem_post(&src_sem);
-    } while (bytes_recvd > 0)
+        bytes_recvd = recv(fromfd, buf, BUF_SIZE, 0);
+        bytes_sent = send(tofd, buf, BUF_SIZE, 0);
+        bzero(buf, BUF_SIZE);
+    } while (bytes_recvd > 0);
 }
 
-void *SendToDestination(int dstsock)
+static th_args MakeArgs(int fromfd, int tofd, uint8_t *buf)
 {
-}
-
-void *ReceiveFromDestination(int dstsock)
-{
-    int bytes_recvd;
-    do
-    {
-        sem_wait(&dst_sem);
-        bytes_recvd = recv(dstsock, dst_buf, BUF_SIZE, 0);
-        sem_post(&dst_sem);
-    } while (bytes_recvd > 0)
+    return (th_args){.fromfd = fromfd, .tofd = tofd, .buf = buf};
 }

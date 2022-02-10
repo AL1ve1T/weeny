@@ -177,7 +177,7 @@ void *Handshake(void *connfd)
 
     // Retranslation of bytes begins here.
 
-    if (!RetranslateBytes(sock, dest_sock))
+    if (!RetranslationBegin(sock, dest_sock))
     {
     }
 
