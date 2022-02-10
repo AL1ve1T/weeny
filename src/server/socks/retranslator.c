@@ -42,6 +42,8 @@ extern bool RetranslationBegin(int srcsock, int dstsock)
     pthread_join(rts, NULL);
 }
 
+// TODO: Make sockets more reliable..
+
 static void *Retranslate(void *args)
 {
     // Unpack arguments
@@ -56,7 +58,15 @@ static void *Retranslate(void *args)
     do
     {
         bytes_recvd = recv(fromfd, buf, BUF_SIZE, 0);
-        bytes_sent = send(tofd, buf, BUF_SIZE, 0);
+        if (bytes_recvd < 0)
+        {
+            break;
+        }
+        bytes_sent = send(tofd, buf, bytes_recvd, 0);
+        if (bytes_sent < 0)
+        {
+            break;
+        }
         bzero(buf, BUF_SIZE);
     } while (bytes_recvd > 0);
 }
