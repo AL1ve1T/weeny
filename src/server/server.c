@@ -83,7 +83,7 @@ void RunServer()
         uint64_t connfd = accept(sockfd, NULL, NULL);
         pthread_t thread_id;
         pthread_create(&thread_id, NULL, Handshake, (void *)connfd);
-        //pthread_join(thread_id, NULL);
+        // pthread_join(thread_id, NULL);
     }
     close(sockfd);
 }

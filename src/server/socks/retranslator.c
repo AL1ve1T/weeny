@@ -9,7 +9,7 @@
 
 #include "zlog.h"
 
-#define BUF_SIZE 0xFF
+#define BUF_SIZE 0x1FFF
 
 uint8_t src_buf[BUF_SIZE];
 uint8_t dst_buf[BUF_SIZE];
@@ -42,8 +42,6 @@ extern bool RetranslationBegin(int srcsock, int dstsock)
     pthread_join(rts, NULL);
 }
 
-// TODO: Make sockets more reliable..
-
 static void *Retranslate(void *args)
 {
     // Unpack arguments
@@ -57,16 +55,15 @@ static void *Retranslate(void *args)
     int bytes_sent = 0;
     do
     {
-        bytes_recvd = recv(fromfd, buf, BUF_SIZE, 0);
-        if (bytes_recvd < 0)
-        {
-            break;
-        }
+        bool stop = false;
+        bytes_recvd = recv(fromfd, buf, BUF_SIZE, MSG_CMSG_CLOEXEC);
+        if (bytes_recvd < BUF_SIZE)
+            stop = true;
+
         bytes_sent = send(tofd, buf, bytes_recvd, 0);
-        if (bytes_sent < 0)
-        {
+
+        if (stop)
             break;
-        }
         bzero(buf, BUF_SIZE);
     } while (bytes_recvd > 0);
 }
