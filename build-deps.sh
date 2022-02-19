@@ -10,10 +10,10 @@ ldconfig
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib" >> ~/.bashrc
 
 # configure zlog
-echo "[formats]
+echo `[formats]
 simple = "%m%n"
 [rules]
-default.DEBUG    >stdout; simple" >> /etc/zlog
+default.DEBUG    >stdout; simple` >> /etc/zlog
 
 # return to root folder
 cd ../..
