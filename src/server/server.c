@@ -11,8 +11,10 @@
 #include <netdb.h>
 #include <pthread.h>
 #include <linux/net.h>
-
 #include "zlog.h"
+#include "server.h"
+
+zlog_category_t *z_category;
 
 #define DEFAULT_PORT 1080
 #define BUF_SIZE 0xFF
@@ -27,27 +29,20 @@
 #define USER_PASS 0x02
 
 void *Handshake(void *connfd);
-bool RetranslateBytes(int cltsock, int srvsock);
-
-zlog_category_t *c;
 
 void RunServer()
 {
-    c = zlog_get_category("default");
-
     int sockfd;
     struct sockaddr_in serveraddr;
     // Create and verify socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
     {
-        zlog_fatal(c, "Could not create socket.");
+        zlog_fatal(z_category, "Could not create socket.");
         exit(1);
     }
     else
-    {
-        zlog_info(c, "Socket creation success.");
-    }
+        zlog_info(z_category, "Socket creation success.");
     bzero(&serveraddr, sizeof(serveraddr));
 
     // Assign IP and PORT
@@ -58,24 +53,20 @@ void RunServer()
     // Bind
     if (bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) != 0)
     {
-        zlog_fatal(c, "Could not bind socket.");
+        zlog_fatal(z_category, "Could not bind socket.");
         exit(2);
     }
     else
-    {
-        zlog_info(c, "Socket binding success.");
-    }
+        zlog_info(z_category, "Socket binding success.");
 
     // Listen
     if (listen(sockfd, 5) != 0)
     {
-        zlog_fatal(c, "Socket listen failed.");
+        zlog_fatal(z_category, "Socket listen failed.");
         exit(3);
     }
     else
-    {
-        zlog_info(c, "Listening started..");
-    }
+        zlog_info(z_category, "Listening started..");
 
     // Accept
     for (;;)
@@ -108,7 +99,7 @@ uint8_t ChooseAuth(uint8_t *methods, uint8_t n_methods)
 void *Handshake(void *connfd)
 {
     uint64_t sock = (uint64_t)connfd;
-    zlog_info(c, "Routine started.");
+    zlog_info(z_category, "Routine started.");
     uint8_t buf[BUF_SIZE];
     int bytes_recvd = 0;
 
@@ -147,7 +138,7 @@ void *Handshake(void *connfd)
     int dest_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (dest_sock == -1)
     {
-        zlog_fatal(c, "Could not create destination socket.");
+        zlog_fatal(z_category, "Could not create destination socket.");
         exit(1);
     }
     struct sockaddr_in dest_addr;
@@ -160,7 +151,7 @@ void *Handshake(void *connfd)
 
     if (connect(dest_sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
     {
-        zlog_fatal(c, "Destination host: connection failed.");
+        zlog_fatal(z_category, "Destination host: connection failed.");
         // Send 0x04 to SOCKS5 client
     }
     // Send connection status to SOCKS5 client

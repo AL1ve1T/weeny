@@ -5,17 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update \
     && apt upgrade -y \
     && apt install -y \
-    apt-utils build-essential clang gdb gdbserver openssh-server rsync cmake git curl
-
-RUN wget https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.tar.gz  \
-    && tar xzf cmake-3.12.3-Linux-x86_64.tar.gz  \
-    && rm -rf cmake-3.12.3-Linux-x86_64.tar.gz  \
-    && cd cmake-3.12.3-Linux-x86_64  \
-    && apt-get install \
-    && ./bin/cmake --version
-
-RUN wget -O cmake-linux.sh https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.sh \
-    && sh cmake-linux.sh -- --skip-license --prefix=/usr/local
+    apt-utils build-essential clang gdb gdbserver openssh-server rsync cmake \
+    git curl libssl-dev
 
 # Taken from - https://docs.docker.com/engine/examples/running_ssh_service/#environment-variables
 RUN mkdir /var/run/sshd
@@ -34,8 +25,6 @@ EXPOSE 22 7777
 # Create dev user with password 'dev'
 RUN useradd -ms /bin/bash dev
 RUN echo 'dev:dev' | chpasswd
-
-RUN mkdir /usr/weeny
 
 ADD . /home/dev
 

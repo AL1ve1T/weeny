@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "server/server.h"
 #include "zlog.h"
+#include "globals.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
         printf("ZLog init failed\n");
         return -1;
     }
+    z_category = zlog_get_category("default");
 
     RunServer();
     return 0;

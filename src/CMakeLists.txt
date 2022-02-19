@@ -1,6 +1,6 @@
 add_subdirectory(server)
 
-add_executable(weeny main.c)
+add_executable(weeny main.c globals.h)
 
 include_directories(/usr/local/include)
 
