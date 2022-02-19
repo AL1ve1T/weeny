@@ -3,7 +3,7 @@ Self-developing proxy server
 
 ## Set-Up for development
 
-1. Build docker image with `docker build .`
+1. Build docker image with `docker build -t weeny .`
 
 2. Run container
 
