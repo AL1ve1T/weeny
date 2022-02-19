@@ -9,11 +9,13 @@
 #include "zlog.h"
 #include "globals.h"
 
+#define ZLOG_CONF_PATH "/etc/zlog.conf"
+
 int main(int argc, char *argv[])
 {
     int rc;
 
-    rc = zlog_init("/etc/zlog.conf");
+    rc = zlog_init(ZLOG_CONF_PATH);
     if (rc)
     {
         printf("ZLog init failed\n");
