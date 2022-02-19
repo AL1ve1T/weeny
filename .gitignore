@@ -10,14 +10,11 @@ build
 .devcontainer/
 .profile
 .vscode/
-CMakeFiles/
 CTestTestfile.cmake
 cmake-build-debug-remote/
-src/CMakeFiles/
-src/server/CMakeFiles/
+**/CMakeFiles/**
 src/weeny
 test/weeny-test
 **/*.a**
 **/*.so**
-test/CMakeFiles/
 test/CTestTestfile.cmake
