@@ -53,7 +53,7 @@ extern bool RetranslationBegin(int src_fd, int dst_fd)
 static int LockAndRecv(sock_t *sock, uint8_t *buf)
 {
     // sem_wait(sock->mutex);
-    int bytes_recvd = recv(sock->sockfd, buf, BUF_SIZE, MSG_CMSG_CLOEXEC);
+    int bytes_recvd = recv(sock->sockfd, buf, BUF_SIZE, 0);
     // sem_post(sock->mutex);
     return bytes_recvd;
 }
@@ -79,15 +79,16 @@ static void *Retranslate(void *args)
     int bytes_sent = 0;
     do
     {
-        bool stop = false;
         bytes_recvd = LockAndRecv(fromfd, buf);
-        if (bytes_recvd < BUF_SIZE)
-            stop = true;
-
-        bytes_sent = LockAndSend(tofd, buf, bytes_recvd);
-
-        if (stop)
+        if (bytes_recvd < 0)
+        {
             break;
+        }
+        bytes_sent = LockAndSend(tofd, buf, bytes_recvd);
+        if (bytes_sent < 0)
+        {
+            break;
+        }
         bzero(buf, BUF_SIZE);
     } while (bytes_recvd > 0);
 }
