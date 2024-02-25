@@ -1,5 +1,5 @@
 # weeny
-Self-developing proxy server
+Tiny C-based proxy server
 
 ## Set-Up for development
 
